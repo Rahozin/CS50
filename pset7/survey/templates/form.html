@@ -6,14 +6,65 @@
     <h1 class="mb-3">Form</h1>
 
     <!-- http://getbootstrap.com/docs/4.1/components/forms/ -->
-    <form action="/form" method="post">
+    <!-- <form action="/form" method="post"> -->
 
-        <!-- TODO -->
+        <!-- <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="name" placeholder="Name" type="text">
+        </div>
+        <div class="form-group">
+            <select class="form-control" name="house">
+                <option disabled selected value>House</option>
+                <option value="Gryffindor">Gryffindor</option>
+                <option value="Hufflepuff">Hufflepuff</option>
+                <option value="Ravenclaw">Ravenclaw</option>
+                <option value="Slytherin">Slytherin</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <div class="form-check">
+                <input class="form-check-input" id="Beater" name="position" type="radio" value="Beater">
+                <label class="form-check-label" for="Beater">Beater</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" id="Chaser" name="position" type="radio" value="Chaser">
+                <label class="form-check-label" for="Chaser">Chaser</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" id="Keeper" name="position" type="radio" value="Keeper">
+                <label class="form-check-label" for="Keeper">Keeper</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" id="Seeker" name="position" type="radio" value="Seeker">
+                <label class="form-check-label" for="Seeker">Seeker</label>
+            </div>
+        </div> -->
+
+        <form action="/action_page.php" class="was-validated">
+            <div class="mb-3 mt-3">
+              <label for="uname" class="form-label">Username:</label>
+              <input type="text" class="form-control" id="uname" placeholder="Enter username" name="uname" required>
+              <div class="valid-feedback">Valid.</div>
+              <div class="invalid-feedback">Please fill out this field.</div>
+            </div>
+            <div class="mb-3">
+              <label for="pwd" class="form-label">Password:</label>
+              <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="pswd" required>
+              <div class="valid-feedback">Valid.</div>
+              <div class="invalid-feedback">Please fill out this field.</div>
+            </div>
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="myCheck"  name="remember" required>
+              <label class="form-check-label" for="myCheck">I agree on blabla.</label>
+              <div class="valid-feedback">Valid.</div>
+              <div class="invalid-feedback">Check this checkbox to continue.</div>
+            </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
 
         <!-- http://getbootstrap.com/docs/4.1/components/buttons/ -->
-        <button class="btn btn-primary" type="submit">Submit</button>
+        <!-- <button class="btn btn-primary" type="submit">Submit</button>
 
-    </form>
+    </form> -->
 
     <script>
 
