@@ -31,9 +31,19 @@ def get_form():
 
 @app.route("/form", methods=["POST"])
 def post_form():
-    return render_template("error.html", message="TODO")
+    name = request.form.get("name")
+    house = request.form.get("house")
+    position = request.form.get("position")
+    # print(request.form.to_dict(flat=False), [name, house, position])
+    if not name or not house or not position:
+        return render_template("error.html", message="Please, fill out all required fields")
+    return redirect("/sheet")
 
 
 @app.route("/sheet", methods=["GET"])
 def get_sheet():
-    return render_template("error.html", message="TODO")
+    return render_template("sheet.html", message="Trying to show the data sheet but fail. Developing is in progress...")
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
