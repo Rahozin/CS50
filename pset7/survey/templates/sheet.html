@@ -2,10 +2,32 @@
 
 {% block main %}
 
-    <!-- http://getbootstrap.com/docs/4.1/components/alerts/ -->
-    <div class="alert alert-danger" role="alert">
-        <h4 class="alert-heading">Sheet Page</h4>
-        <p>{{ message }}</p>
-    </div>
+    <table id="table" class="display" style="width:100%">
+        <thead>
+            <tr>
+                {% for fieldname in table.fieldnames %}
+                    <th> {{ fieldname }} </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in table %}
+                    <tr>
+                        {% for fieldname in table.fieldnames %}
+                            <td> {{ row[fieldname] }} </td>
+                        {% endfor %}
+                    </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- https://datatables.net/examples/basic_init/zero_configuration.html -->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#table').DataTable();
+        });
+    </script>
 
 {% endblock %}

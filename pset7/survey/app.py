@@ -55,7 +55,14 @@ def post_form():
 
 @app.route("/sheet", methods=["GET"])
 def get_sheet():
-    return render_template("sheet.html", message="Trying to show the data sheet but fail. Developing is in progress...")
+
+    with open('survey.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        print(reader.fieldnames[0])
+        # for row in reader:
+        #     print(row)
+
+        return render_template("sheet.html", table=reader)
 
 
 if __name__ == '__main__':
