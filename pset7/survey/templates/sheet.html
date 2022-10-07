@@ -2,6 +2,10 @@
 
 {% block main %}
 
+    <div style="margin-bottom: 20px">
+            <a class="btn btn-success" href="{{url_for('download')}}">Download</a>
+    </div>
+
     <table id="table" class="display" style="width:100%">
         <thead>
             <tr>
@@ -20,6 +24,7 @@
             {% endfor %}
         </tbody>
     </table>
+
 
     <!-- https://datatables.net/examples/basic_init/zero_configuration.html -->
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>

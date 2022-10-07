@@ -1,8 +1,8 @@
-# import cs50
+import os
 import csv
-from pandas import DataFrame, read_csv
-
-from flask import Flask, jsonify, redirect, render_template, request
+import smtplib, ssl
+from pandas import read_csv
+from flask import Flask, send_file, redirect, render_template, request
 
 # Configure application
 app = Flask(__name__)
@@ -35,7 +35,7 @@ def post_form():
     
     # Check whether the required fields have been filled
     name = request.form.get("Name")
-    # email = request.form.get("Email")
+    email = request.form.get("Email")
     house = request.form.get("House")
     position = request.form.get("Position")
     if not name or not house or not position:
@@ -51,16 +51,47 @@ def post_form():
             writer.writeheader()
         writer.writerow(request.form.to_dict())
 
+    # Send an confirmation Email
+    # message = f"{name}, you are registered!"
+    # # context = ssl.create_default_context()
+    # port = 465  # For SSL
+    # password = os.getenv('PASS')
+
+    # # Create a secure SSL context
+    # context = ssl.create_default_context()
+
+    # with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+    #     server.login("usdiversityvisaprogram@gmail.com", password)
+    #     server.sendmail('usdiversityvisaprogram@gmail.com', email, message)
+
+    # server = smtplib.SMTP("smtp.gmail.com", 587)
+    # server.starttls(context=context)
+    # server.login('usdiversityvisaprogram@gmail.com', os.getenv('PASS'))
+    # server.sendmail('usdiversityvisaprogram@gmail.com', email, message)
+
+    # server = smtplib.SMTP("smtp.pl.energy.gov.ua", 587)
+    # server.starttls()
+    # server.login('usdiversityvisaprogram@gmail.com', os.getenv('PASS'))
+    # server.sendmail('usdiversityvisaprogram@gmail.com', email, message)
+
     return redirect("/sheet")
 
 
 @app.route("/sheet", methods=["GET"])
 def get_sheet():
 
+    # print(os.getenv("PASS")) 
+
     # Read and display data from csvfile
     with open('survey.csv', newline='') as csvfile:
         reader = csv.DictReader(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         return render_template("sheet.html", table=reader)
+
+
+@app.route('/download')
+def download():
+    path = 'survey.csv'
+    return send_file(path, as_attachment=True)
 
 
 if __name__ == '__main__':
