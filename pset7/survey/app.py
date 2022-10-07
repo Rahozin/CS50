@@ -35,14 +35,15 @@ def post_form():
     
     # Check whether the required fields have been filled
     name = request.form.get("Name")
+    # email = request.form.get("Email")
     house = request.form.get("House")
     position = request.form.get("Position")
     if not name or not house or not position:
         return render_template("error.html", message="Please, fill out all required fields")
     
-    # Write the information to the csvfile
+    # Write data to csvfile
     with open('survey.csv', 'a', newline='') as csvfile:
-        fieldnames = ['Name', 'House', 'Position']
+        fieldnames = ['Name', 'Email', 'House', 'Position']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         try:
             read_csv('survey.csv')
@@ -56,12 +57,9 @@ def post_form():
 @app.route("/sheet", methods=["GET"])
 def get_sheet():
 
+    # Read and display data from csvfile
     with open('survey.csv', newline='') as csvfile:
         reader = csv.DictReader(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        print(reader.fieldnames[0])
-        # for row in reader:
-        #     print(row)
-
         return render_template("sheet.html", table=reader)
 
 
