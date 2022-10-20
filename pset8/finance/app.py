@@ -50,7 +50,45 @@ def index():
 @login_required
 def buy():
     """Buy shares of stock"""
-    return apology("TODO")
+
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        symbol = request.form.get("symbol")
+        shares = request.form.get("shares")
+
+        # Ensure symbol was entered
+        if not symbol:
+            return apology("missing symbol", 400)
+
+        # Ensure symbol exists
+        if not lookup(symbol):
+            return apology("symbol doesn`t exist", 400)
+
+        # Ensure shares is positive integer
+        try:
+            shares = int(shares)
+        except:
+            return apology("shares must be whole number", 400)
+        if shares < 1:
+            return apology("shares must be positive whole number", 400)
+
+        # Check amount of the user`s cash
+        cash = db.execute("SELECT cash FROM users WHERE id = :user_id",
+                          user_id=session['user_id'])[0]['cash']
+
+        # Cash needed to buy the order
+        price = float(lookup(symbol)['price']) * shares
+
+        # Ensure there is enough cash
+        if price > cash:
+            return apology("not enough cash to buy this order, please top up", 400)
+
+        # Redirect user to home page
+        return redirect("/")
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("buy.html")
 
 
 @app.route("/check", methods=["GET"])
