@@ -120,7 +120,33 @@ def logout():
 @ login_required
 def quote():
     """Get stock quote."""
-    return apology("TODO")
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        symbol = request.form.get("symbol")
+
+        # Ensure symbol was entered
+        if not symbol:
+            return apology("missing symbol", 400)
+
+        quoted = lookup(symbol)
+        # lookup doesn`t work because of old API, so ...
+        # quoted = {
+        #     "name": "International Business Machines Corp.",
+        #     "price": "122.51",
+        #     "symbol": "IBM"
+        # }
+
+        # Ensure symbol was entered
+        if not quoted:
+            return apology("invalid symbol", 400)
+
+        message = f"A share of {quoted['name']} ({quoted['symbol']}) costs ${quoted['price']}."
+
+        return render_template("quoted.html", message=message)
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("quote.html")
 
 
 @ app.route("/register", methods=["GET", "POST"])
@@ -129,6 +155,7 @@ def register():
     # Forget any user_id
     session.clear()
 
+    # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
         username = request.form.get("username")
         hash = generate_password_hash(request.form.get("password"))
