@@ -48,19 +48,19 @@ def lookup(symbol):
     #     return None
 
     # API doesn`t work and I don't know how to fix it yet? so
-    if urllib.parse.quote_plus(symbol).upper() == "USD":
+    if urllib.parse.quote_plus(symbol) == "USD":
         return {
             "name": "ProShares Trust - ProShares Ultra Semiconductors 2X Shares",
             "price": "13.30",
             "symbol": "USD"
         }
-    elif urllib.parse.quote_plus(symbol).upper() == "IBM":
+    elif urllib.parse.quote_plus(symbol) == "IBM":
         return {
             "name": "International Business Machines Corp.",
             "price": "122.51",
             "symbol": "IBM"
         }
-    elif urllib.parse.quote_plus(symbol).upper() == "APP":
+    elif urllib.parse.quote_plus(symbol) == "APP":
         return {
             "name": "Applovin Corp - Class A",
             "price": "17.44",

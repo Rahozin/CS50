@@ -53,7 +53,7 @@ def buy():
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
-        symbol = request.form.get("symbol")
+        symbol = request.form.get("symbol").upper()
         shares = request.form.get("shares")
 
         # Ensure symbol was entered
@@ -76,12 +76,36 @@ def buy():
         cash = db.execute("SELECT cash FROM users WHERE id = :user_id",
                           user_id=session['user_id'])[0]['cash']
 
+        # Get share data using symbol
+        share_data = lookup(symbol)
+
         # Cash needed to buy the order
-        price = float(lookup(symbol)['price']) * shares
+        price = float(share_data['price']) * shares
 
         # Ensure there is enough cash
         if price > cash:
             return apology("not enough cash to buy this order, please top up", 400)
+
+        # Add new share to db if needed
+        try:
+            db.execute("INSERT INTO shares (name, symbol) VALUES (:name, :symbol)",
+                       name=share_data['name'], symbol=share_data['symbol'])
+        except:
+            pass
+
+        # Get the share's id
+        share_id = db.execute("SELECT id FROM shares WHERE symbol = :symbol",
+                              symbol=symbol)[0]['id']
+
+        # Update user's cash with the purchase
+        db.execute("UPDATE users SET cash = :user_cash WHERE id = :user_id",
+                   user_cash=cash-price, user_id=session['user_id'])
+
+        # Add a new line to the history of orders
+        db.execute(
+            "INSERT INTO orders (user_id, share_id, shares, by_price) VALUES (:user_id, :share_id, :shares, :by_price)",
+            user_id=session['user_id'],
+            share_id=share_id, shares=shares, by_price=price)
 
         # Redirect user to home page
         return redirect("/")
@@ -160,7 +184,7 @@ def quote():
     """Get stock quote."""
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
-        symbol = request.form.get("symbol")
+        symbol = request.form.get("symbol").upper()
 
         # Ensure symbol was entered
         if not symbol:
