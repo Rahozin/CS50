@@ -43,7 +43,19 @@ db = SQL("sqlite:///finance.db")
 @login_required
 def index():
     """Show portfolio of stocks"""
-    return apology("TODO")
+
+    portfolio_table = db.execute(
+        "SELECT shares.symbol AS Symbol, shares.name AS Name, SUM(orders.shares) AS Shares, orders.by_price AS Price FROM orders INNER JOIN shares ON shares.id=orders.share_id WHERE user_id = :user_id GROUP BY Symbol",
+        user_id=session['user_id'])
+    table_headers = ("Symbol", "Name", "Shares", "Price")
+    actual_cash = round(db.execute("SELECT cash FROM users WHERE id = :user_id",
+                                   user_id=session['user_id'])[0]['cash'], 2)
+    orders_total = 1268.75
+    total = actual_cash + orders_total
+
+    return render_template(
+        "portfolio.html", table=portfolio_table, headers=table_headers, cash=actual_cash,
+        total=total)
 
 
 @app.route("/buy", methods=["GET", "POST"])
