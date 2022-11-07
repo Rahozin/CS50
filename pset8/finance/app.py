@@ -44,18 +44,31 @@ db = SQL("sqlite:///finance.db")
 def index():
     """Show portfolio of stocks"""
 
+    # Get data from db
     portfolio_table = db.execute(
-        "SELECT shares.symbol AS Symbol, shares.name AS Name, SUM(orders.shares) AS Shares, orders.by_price AS Price FROM orders INNER JOIN shares ON shares.id=orders.share_id WHERE user_id = :user_id GROUP BY Symbol",
+        "SELECT shares.symbol AS Symbol, shares.name AS Name, SUM(orders.shares) AS Shares FROM orders INNER JOIN shares ON shares.id=orders.share_id WHERE user_id = :user_id GROUP BY Symbol",
         user_id=session['user_id'])
-    table_headers = ("Symbol", "Name", "Shares", "Price")
-    actual_cash = round(db.execute("SELECT cash FROM users WHERE id = :user_id",
-                                   user_id=session['user_id'])[0]['cash'], 2)
-    orders_total = 1268.75
-    total = actual_cash + orders_total
+    actual_cash = db.execute("SELECT cash FROM users WHERE id = :user_id",
+                             user_id=session['user_id'])[0]['cash']
 
+    # Get actual prices, count totals and add to the table
+    total = actual_cash
+    for row_num in range(len(portfolio_table)):
+        actual_price = lookup(portfolio_table[row_num]['Symbol'])['price']
+        portfolio_table[row_num]['Price'] = actual_price
+        row_total = portfolio_table[row_num]['Shares'] * \
+            lookup(portfolio_table[row_num]['Symbol'])['price']
+        portfolio_table[row_num]['TOTAL'] = row_total
+        total += row_total
+
+    # Typed manualy else raise an error if no orders
+    table_headers = ("Symbol", "Name", "Shares", "Price", "TOTAL")
+    # table_headers = list(portfolio_table[0].keys())
+
+    # Display page
     return render_template(
-        "portfolio.html", table=portfolio_table, headers=table_headers, cash=actual_cash,
-        total=total)
+        "portfolio.html", table=portfolio_table, headers=table_headers,
+        cash=actual_cash, total=total)
 
 
 @app.route("/buy", methods=["GET", "POST"])

@@ -51,19 +51,19 @@ def lookup(symbol):
     if urllib.parse.quote_plus(symbol) == "USD":
         return {
             "name": "ProShares Trust - ProShares Ultra Semiconductors 2X Shares",
-            "price": "13.30",
+            "price": 14.80,
             "symbol": "USD"
         }
     elif urllib.parse.quote_plus(symbol) == "IBM":
         return {
             "name": "International Business Machines Corp.",
-            "price": "122.51",
+            "price": 122.91,
             "symbol": "IBM"
         }
     elif urllib.parse.quote_plus(symbol) == "APP":
         return {
             "name": "Applovin Corp - Class A",
-            "price": "17.44",
+            "price": 16.94,
             "symbol": "APP"
         }
     else:

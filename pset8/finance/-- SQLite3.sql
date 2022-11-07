@@ -12,3 +12,9 @@ GROUP BY Symbol;
 SELECT symbol FROM shares;
 
 SELECT cash FROM users;
+
+SELECT shares.symbol
+FROM orders
+INNER JOIN shares ON shares.id = orders.share_id
+WHERE user_id = 1
+GROUP BY Symbol;
