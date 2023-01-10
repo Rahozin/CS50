@@ -288,7 +288,71 @@ def register():
 @ login_required
 def sell():
     """Sell shares of stock"""
-    return apology("TODO")
+    
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        symbol = request.form.get("symbol")
+        shares = request.form.get("shares")
+
+        # Ensure symbol was entered
+        if not symbol:
+            return apology("missing symbol", 400)
+
+        # Ensure symbol exists
+        if not lookup(symbol):
+            return apology("symbol doesn`t exist", 400)
+
+        # Ensure shares is positive integer
+        try:
+            shares = int(shares)
+        except:
+            return apology("shares must be whole number", 400)
+        if shares < 1:
+            return apology("shares must be positive whole number", 400)
+
+        # Get data from db
+        share_quantity = db.execute(
+        "SELECT SUM(orders.shares) AS shares FROM orders INNER JOIN shares ON shares.id=orders.share_id WHERE user_id = :user_id AND symbol = :symbol",
+        user_id=session['user_id'], symbol=symbol)[0]['shares']
+
+        # Ensure shares are sufficient
+        if shares > share_quantity:
+            return apology("you have not enough shares", 400)
+        
+        # Check amount of the user`s cash
+        cash = db.execute("SELECT cash FROM users WHERE id = :user_id",
+                          user_id=session['user_id'])[0]['cash']
+
+        # Get share data using symbol
+        share_data = lookup(symbol)
+
+        # Free up cash by selling the order
+        price = float(share_data['price']) * shares
+
+        # Get the share's id
+        share_id = db.execute("SELECT id FROM shares WHERE symbol = :symbol",
+                              symbol=symbol)[0]['id']
+
+        # Update user's cash due to the sell
+        db.execute("UPDATE users SET cash = :user_cash WHERE id = :user_id",
+                   user_cash=cash+price, user_id=session['user_id'])
+
+        # Add a new line to the history of orders
+        db.execute(
+            "INSERT INTO orders (user_id, share_id, shares, by_price) VALUES (:user_id, :share_id, :shares, :by_price)",
+            user_id=session['user_id'],
+            share_id=share_id, shares=-shares, by_price=price)
+
+        # Redirect user to home page
+        return redirect("/")
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        shares_table = db.execute("SELECT shares.symbol AS symbol FROM orders INNER JOIN shares ON shares.id = orders.share_id WHERE user_id = :user_id GROUP BY symbol;",
+                          user_id=session['user_id'])
+
+        return render_template("sell.html", shares=shares_table)
+
 
 
 def errorhandler(e):

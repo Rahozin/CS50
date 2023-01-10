@@ -18,3 +18,14 @@ FROM orders
 INNER JOIN shares ON shares.id = orders.share_id
 WHERE user_id = 1
 GROUP BY Symbol;
+
+SELECT shares.symbol AS symbol
+FROM orders
+INNER JOIN shares ON shares.id = orders.share_id
+WHERE user_id = 1
+GROUP BY symbol;
+
+SELECT SUM(orders.shares) AS Shares
+FROM orders
+INNER JOIN shares ON shares.id=orders.share_id 
+WHERE user_id = 1 AND symbol = 'IBM';
