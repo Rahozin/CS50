@@ -46,7 +46,12 @@ def index():
 
     # Get data from db
     portfolio_table = db.execute(
-        "SELECT shares.symbol AS Symbol, shares.name AS Name, SUM(orders.shares) AS Shares FROM orders INNER JOIN shares ON shares.id=orders.share_id WHERE user_id = :user_id GROUP BY Symbol",
+        """SELECT shares.symbol AS Symbol, shares.name AS Name, SUM(orders.shares) AS Shares
+        FROM orders
+        INNER JOIN shares ON shares.id=orders.share_id
+        WHERE user_id = :user_id
+        GROUP BY Symbol
+        HAVING SUM(orders.shares) > 0;""",
         user_id=session['user_id'])
     actual_cash = db.execute("SELECT cash FROM users WHERE id = :user_id",
                              user_id=session['user_id'])[0]['cash']
@@ -339,7 +344,8 @@ def sell():
 
         # Add a new line to the history of orders
         db.execute(
-            "INSERT INTO orders (user_id, share_id, shares, by_price) VALUES (:user_id, :share_id, :shares, :by_price)",
+            """INSERT INTO orders (user_id, share_id, shares, by_price)
+            VALUES (:user_id, :share_id, :shares, :by_price);""",
             user_id=session['user_id'],
             share_id=share_id, shares=-shares, by_price=price)
 
@@ -348,7 +354,12 @@ def sell():
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
-        shares_table = db.execute("SELECT shares.symbol AS symbol FROM orders INNER JOIN shares ON shares.id = orders.share_id WHERE user_id = :user_id GROUP BY symbol;",
+        shares_table = db.execute(
+            """SELECT shares.symbol AS symbol
+            FROM orders INNER JOIN shares ON shares.id = orders.share_id
+            WHERE user_id = :user_id
+            GROUP BY symbol
+            HAVING SUM(orders.shares) > 0;""",
                           user_id=session['user_id'])
 
         return render_template("sell.html", shares=shares_table)
