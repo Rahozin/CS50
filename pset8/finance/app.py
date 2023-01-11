@@ -54,7 +54,7 @@ def index():
         HAVING SUM(orders.shares) > 0;""",
         user_id=session['user_id'])
     actual_cash = db.execute("SELECT cash FROM users WHERE id = :user_id",
-                             user_id=session['user_id'])[0]['cash']
+                            user_id=session['user_id'])[0]['cash']
 
     # Get actual prices, count totals and add to the table
     total = actual_cash
@@ -110,10 +110,11 @@ def buy():
         share_data = lookup(symbol)
 
         # Cash needed to buy the order
-        price = float(share_data['price']) * shares
+        share_price = float(share_data['price'])
+        order_price = share_price * shares
 
         # Ensure there is enough cash
-        if price > cash:
+        if order_price > cash:
             return apology("not enough cash to buy this order, please top up", 400)
 
         # Add new share to db if needed
@@ -129,13 +130,13 @@ def buy():
 
         # Update user's cash with the purchase
         db.execute("UPDATE users SET cash = :user_cash WHERE id = :user_id",
-                   user_cash=cash-price, user_id=session['user_id'])
+                   user_cash=cash-order_price, user_id=session['user_id'])
 
         # Add a new line to the history of orders
         db.execute(
             "INSERT INTO orders (user_id, share_id, shares, by_price) VALUES (:user_id, :share_id, :shares, :by_price)",
             user_id=session['user_id'],
-            share_id=share_id, shares=shares, by_price=price)
+            share_id=share_id, shares=shares, by_price=share_price)
 
         # Redirect user to home page
         return redirect("/")
@@ -155,7 +156,23 @@ def check():
 @login_required
 def history():
     """Show history of transactions"""
-    return apology("TODO")
+
+    # Get data from db
+    portfolio_table = db.execute(
+        """SELECT shares.symbol AS Symbol, orders.shares AS Shares,
+        orders.by_price AS Price, orders.date_time AS Transacted
+        FROM orders
+        INNER JOIN shares ON shares.id=orders.share_id
+        WHERE user_id = :user_id;""",
+        user_id=session['user_id'])
+
+    # Typed manualy else raise an error if no orders
+    table_headers = ("Symbol", "Shares", "Price", "Transacted")
+    # table_headers = list(portfolio_table[0].keys())
+
+    # Display page
+    return render_template(
+        "history.html", table=portfolio_table, headers=table_headers)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -332,7 +349,8 @@ def sell():
         share_data = lookup(symbol)
 
         # Free up cash by selling the order
-        price = float(share_data['price']) * shares
+        share_price = float(share_data['price'])
+        order_price = share_price * shares
 
         # Get the share's id
         share_id = db.execute("SELECT id FROM shares WHERE symbol = :symbol",
@@ -340,14 +358,14 @@ def sell():
 
         # Update user's cash due to the sell
         db.execute("UPDATE users SET cash = :user_cash WHERE id = :user_id",
-                   user_cash=cash+price, user_id=session['user_id'])
+                   user_cash=cash+order_price, user_id=session['user_id'])
 
         # Add a new line to the history of orders
         db.execute(
             """INSERT INTO orders (user_id, share_id, shares, by_price)
             VALUES (:user_id, :share_id, :shares, :by_price);""",
             user_id=session['user_id'],
-            share_id=share_id, shares=-shares, by_price=price)
+            share_id=share_id, shares=-shares, by_price=share_price)
 
         # Redirect user to home page
         return redirect("/")

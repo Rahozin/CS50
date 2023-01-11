@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}
+History
+{% endblock %}
+
+{% block main %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th class="text-start"> {{ headers[0] }} </th>
+            <th class="text-end"> {{ headers[1] }} </th>
+            <th class="text-end"> {{ headers[2] }} </th>
+            <th class="text-end"> {{ headers[3] }} </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in table %}
+        <tr>
+            <td class="text-start"> {{ row[headers[0]] }} </td>
+            <td class="text-end"> {{ row[headers[1]] }} </td>
+            <td class="text-end"> {{ row[headers[2]] | usd }} </td>
+            <td class="text-end"> {{ row[headers[3]] }} </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

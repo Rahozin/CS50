@@ -21,7 +21,50 @@ CREATE TABLE users (
     cash REAL NOT NULL DEFAULT 10000.00
 );
 
+
 -- Delete tables(for clear all data)
 DROP TABLE orders;
-DROP TABLE shares;
-DROP TABLE users;
+
+
+-- Delete specific rows from table
+DELETE FROM orders
+WHERE id < 10;
+
+
+-- Change data in db
+UPDATE users
+SET cash = 7519.13
+WHERE id = 1;
+
+
+-- 
+INSERT INTO shares2 SELECT * FROM shares;
+
+ALTER TABLE shares2 RENAME TO shares;
+
+SELECT id FROM shares WHERE symbol = 'IBM';
+
+SELECT
+    shares.symbol AS Symbol,
+    shares.name AS Name,
+    SUM(orders.shares) AS Shares,
+    orders.by_price AS Price
+FROM orders
+INNER JOIN shares ON shares.id = orders.share_id
+WHERE user_id = 1
+GROUP BY Symbol;
+
+SELECT symbol FROM shares;
+
+SELECT cash FROM users;
+
+SELECT shares.symbol
+FROM orders
+INNER JOIN shares ON shares.id = orders.share_id
+WHERE user_id = 1
+GROUP BY symbol;
+
+SELECT SUM(orders.shares) AS Shares
+FROM orders
+INNER JOIN shares ON shares.id=orders.share_id 
+WHERE user_id = 1 AND symbol = 'IBM';
