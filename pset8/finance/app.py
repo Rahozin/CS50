@@ -149,7 +149,14 @@ def buy():
 @app.route("/check", methods=["GET"])
 def check():
     """Return true if username available, else false, in JSON format"""
-    return jsonify("TODO")
+
+    username = request.args.get("username")
+    user = db.execute("SELECT * FROM users WHERE username = :username", username=username)
+    if len(user) == 0:
+        return jsonify(success=True)
+
+    else:
+        return jsonify(success=False)
 
 
 @app.route("/history")
@@ -266,7 +273,11 @@ def register():
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
+        
         username = request.form.get("username")
+
+        # return redirect("/check/?username=%s" % username)
+
         hash = generate_password_hash(request.form.get("password"))
 
         # Ensure username was submitted
